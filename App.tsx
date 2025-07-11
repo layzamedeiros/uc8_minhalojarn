@@ -1,20 +1,54 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import ScreenLogin from './src/screens/screenLogin';
+import ScreenProducts from './src/screens/screenProducts';
+import { getToken, removeToken } from './src/services/serviceStorage';
+import api from './src/api/axiosConfig';
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      const token = await getToken();
+      if (token) {
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        setAuthenticated(true);
+      } else {
+        setAuthenticated(false);
+      }
+      setInitialLoading(false);
+    };
+
+    checkAuthentication();
+  }, []);
+
+  const handleLogout = async () => {
+    await removeToken();
+    delete api.defaults.headers.common['Authorization'];
+    setAuthenticated(false);
+  };
+
+  if (initialLoading) {
+    return (
+      <View style={styles.centeredContainer}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (authenticated) {
+    return <ScreenProducts toLogout={handleLogout} />;
+  } else {
+    return <ScreenLogin toLoginSuccess={() => setAuthenticated(true)} />;
+  }
 }
 
 const styles = StyleSheet.create({
-  container: {
+  centeredContainer: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
   },
 });

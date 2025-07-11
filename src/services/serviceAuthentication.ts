@@ -4,8 +4,8 @@ import { CredentialsLogin, ResponseLoginApi } from "../types/api";
 export async function performLogin(credentials: CredentialsLogin): Promise<ResponseLoginApi> {
   try {
     const response = await api.post<ResponseLoginApi>('auth/login', {
-      username: credentials.usuario,
-      password: credentials.senha,
+      username: credentials.user,
+      password: credentials.password,
     });
     return response.data;
   } catch (erro: any) {
