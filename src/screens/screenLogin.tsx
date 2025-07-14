@@ -22,7 +22,7 @@ const handleLogin = async () => {
     await saveToken(response.token);
     toLoginSuccess();
   } catch (error: any) {
-    setErrorMessage(error.message || 'Unexpected error. Please try again.');
+    setErrorMessage(error.message || "Erro inesperado. Tente novamente.");
   } finally {
     setLoading(false);
   }
@@ -34,7 +34,7 @@ return (
 
     <TextInput
       style={styles.input}
-      placeholder="Username"
+      placeholder="Nome de Usuário"
       value={userName}
       onChangeText={setUserName}
       autoCapitalize="none"
@@ -42,7 +42,7 @@ return (
 
     <TextInput
       style={styles.input}
-      placeholder="Password"
+      placeholder="Senha"
       value={userPassword}
       onChangeText={setUserPassword}
       secureTextEntry
@@ -56,7 +56,7 @@ return (
         onPress={handleLogin}
         disabled={!userName || !userPassword}
       >
-        <Text style={styles.buttonText}>Sign In</Text>
+        <Text style={styles.buttonText}>Entrar</Text>
       </TouchableOpacity>
     )}
 

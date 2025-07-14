@@ -1,13 +1,17 @@
+import { useNavigation } from "@react-navigation/native";
 import React, { useState, useEffect } from "react";
 import { View, Text, FlatList, ActivityIndicator, StyleSheet, TextInput, TouchableOpacity, Image } from "react-native";
 import { getAllProducts } from "../services/serviceProducts";
 import { ProductApi } from "../types/api";
+import { ProductDetailsProps } from "../../App";
 
 interface ScreenProductsProps {
   toLogout: () => void;
 }
 
 export default function ScreenProducts({ toLogout }: ScreenProductsProps) {
+  const navigation = useNavigation<ProductDetailsProps>();
+
   const [listProducts, setListProducts] = useState<ProductApi[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<ProductApi[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
@@ -45,14 +49,17 @@ export default function ScreenProducts({ toLogout }: ScreenProductsProps) {
   }, [termSearch, listProducts]);
 
   const renderProductItem = ({ item }: { item: ProductApi }) => (
-    <View style={styles.productItem}>
+    <TouchableOpacity
+      style={styles.productItem}
+      onPress={() => navigation.navigate("DetailsProducts", { productId: item.id })}
+    >
       <Image source={{ uri: item.image }} style={styles.productImage} />
       <View style={styles.productDetails}>
         <Text style={styles.productTitle}>{item.title}</Text>
         <Text style={styles.productCategory}>{item.category}</Text>
         <Text style={styles.productPrice}>R$ {item.price.toFixed(2)}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   if (loadingProducts) {
@@ -101,24 +108,36 @@ export default function ScreenProducts({ toLogout }: ScreenProductsProps) {
   );
 }
 
-
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingTop: 50, paddingHorizontal: 10 },
-  centerContainer: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
+  container: {
+    flex: 1,
+    paddingTop: 50,
+    paddingHorizontal: 10,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 20,
   },
-  pageTitle: { fontSize: 26 },
+  pageTitle: {
+    fontSize: 26,
+  },
   logoutButton: {
     paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 5,
     backgroundColor: "#ccc",
   },
-  buttonText: { fontSize: 14 },
+  buttonText: {
+    fontSize: 14,
+  },
   searchInput: {
     width: "100%",
     padding: 10,
@@ -136,11 +155,34 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignItems: "center",
   },
-  productImage: { width: 60, height: 60, borderRadius: 5, marginRight: 15 },
-  productDetails: { flex: 1 },
-  productTitle: { fontSize: 16, marginBottom: 5 },
-  productCategory: { fontSize: 12, marginBottom: 5, opacity: 0.7 },
-  productPrice: { fontSize: 15, fontWeight: "bold" },
-  listContent: { paddingBottom: 20 },
-  errorMessage: { textAlign: "center", marginBottom: 20, color: "red" },
+  productImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 5,
+    marginRight: 15,
+  },
+  productDetails: {
+    flex: 1,
+  },
+  productTitle: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  productCategory: {
+    fontSize: 12,
+    marginBottom: 5,
+    opacity: 0.7,
+  },
+  productPrice: {
+    fontSize: 15,
+    fontWeight: "bold",
+  },
+  listContent: {
+    paddingBottom: 20,
+  },
+  errorMessage: {
+    textAlign: "center",
+    marginBottom: 20,
+    color: "red",
+  },
 });
