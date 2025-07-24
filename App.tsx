@@ -2,14 +2,37 @@ import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Toast, { BaseToast, ToastConfig } from "react-native-toast-message";
 
 import ScreenLogin from './src/screens/screenLogin';
 import ScreenProducts from './src/screens/screenProducts';
 import ScreenDetailsProduct from './src/screens/screenDetailsProduct';
 import { getToken, removeToken } from './src/services/serviceStorage';
 import api from './src/api/axiosConfig';
+import ScreenSearchProducts from './src/screens/screenSearchProducts';
+
+const toastConfig: ToastConfig = {
+  info: (props) => (
+    <BaseToast
+      {...props}
+      style={{ borderLeftColor: "#c43232", backgroundColor: "#ffffff" }}
+      contentContainerStyle={{ paddingHorizontal: 15 }}
+      text1Style={{
+        fontSize: 16,
+        fontWeight: "bold",
+        color: "#c43232",
+      }}
+      text2Style={{
+        fontSize: 14,
+        color: "#555",
+      }}
+    />
+  ),
+};
 
 type Screens = {
+  Products: undefined;
+  ScreenSearchProducts: undefined;
   DetailsProducts: {
     productId: number;
   }
@@ -20,6 +43,7 @@ export type ProductDetailsProps = NativeStackNavigationProp<Screens>;
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [initialLoading, setInitialLoading] = useState(true);
 
@@ -53,27 +77,34 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {authenticated ? (
-          <Stack.Group>
-            <Stack.Screen name="Products" options={{ title: "Lista de Produtos" }}>
-              {(props) => <ScreenProducts {...props} toLogout={handleLogout} />}
-            </Stack.Screen>
+    <>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          {authenticated ? (
+            <Stack.Group>
+              <Stack.Screen name="Products">
+                {(props) => <ScreenProducts {...props} toLogout={handleLogout} />}
+              </Stack.Screen>
 
-            <Stack.Screen name="DetailsProducts" options={{ title: "Detalhes do Produto" }}>
-              {(props) => <ScreenDetailsProduct {...props} />}
-            </Stack.Screen>
-          </Stack.Group>
-        ) : (
-          <Stack.Group>
-            <Stack.Screen name="Login" options={{ title: "Entrar" }}>
-              {(props) => <ScreenLogin {...props} toLoginSuccess={() => setAuthenticated(true)} />}
-            </Stack.Screen>
-          </Stack.Group>
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+              <Stack.Screen name="ScreenSearchProducts">
+                {(props) => <ScreenSearchProducts {...props} toLogout={handleLogout} />}
+              </Stack.Screen>
+
+              <Stack.Screen name="DetailsProducts">
+                {(props) => <ScreenDetailsProduct {...props} />}
+              </Stack.Screen>
+            </Stack.Group>
+          ) : (
+            <Stack.Group>
+              <Stack.Screen name="Login" options={{ title: "Entrar" }}>
+                {(props) => <ScreenLogin {...props} toLoginSuccess={() => setAuthenticated(true)} />}
+              </Stack.Screen>
+            </Stack.Group>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+      <Toast config={toastConfig} />
+    </>
   );
 }
 

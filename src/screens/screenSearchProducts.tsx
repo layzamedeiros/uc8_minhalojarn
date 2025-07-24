@@ -4,13 +4,13 @@ import { View, Text, FlatList, ActivityIndicator, StyleSheet, TextInput, Touchab
 import { getAllProducts } from "../services/serviceProducts";
 import { ProductApi } from "../types/api";
 import { ProductDetailsProps } from "../../App";
-import { MagnifyingGlassIcon } from "phosphor-react-native";
+import Toast from "react-native-toast-message";
 
 interface ScreenProductsProps {
   toLogout: () => void;
 }
 
-export default function ScreenProducts({ toLogout }: ScreenProductsProps) {
+export default function ScreenSearchProducts({ toLogout }: ScreenProductsProps) {
   const navigation = useNavigation<ProductDetailsProps>();
 
   const [listProducts, setListProducts] = useState<ProductApi[]>([]);
@@ -46,6 +46,15 @@ export default function ScreenProducts({ toLogout }: ScreenProductsProps) {
         product.category.toLowerCase().includes(termSearch.toLowerCase())
       );
       setFilteredProducts(filtered);
+
+    if (filtered.length === 0) {
+      Toast.show({
+        type: "info",
+        text1: "Nenhum resultado encontrado",
+        text2: `Para "${termSearch}"`,
+      });
+    }
+
     }
   }, [termSearch, listProducts]);
 
@@ -87,15 +96,17 @@ export default function ScreenProducts({ toLogout }: ScreenProductsProps) {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.pageTitle}>Produtos</Text>
-      <View style={styles.actionsGroup}>
-        <TouchableOpacity onPress={() => navigation.navigate("ScreenSearchProducts")}>
-        <MagnifyingGlassIcon size={24} color="#000" weight="regular" />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.logoutButton} onPress={toLogout}>
-        <Text style={styles.buttonText}>Sair</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity style={styles.logoutButton} onPress={toLogout}>
+          <Text style={styles.buttonText}>Sair</Text>
+        </TouchableOpacity>
       </View>
+
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Pesquisar produtos..."
+        value={termSearch}
+        onChangeText={setTermSearch}
+      />
 
       <FlatList
         data={filteredProducts}
@@ -124,11 +135,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 20,
-  },
-  actionsGroup: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 20
   },
   pageTitle: {
     fontSize: 26,
